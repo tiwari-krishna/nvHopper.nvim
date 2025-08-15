@@ -1,22 +1,60 @@
 # nvHopper.nvim
 
-Neovim buffer switcher
+A **fast, lightweight buffer switcher** for Neovim, with a smooth floating-window interface and jump-based navigation.
 
-## Enable the follwing code inside of your init.lua
+---
+
+## Installation
+
+Install via your favorite plugin manager (example using [lazy.nvim](https://github.com/folke/lazy.nvim)):
+
+```lua
+{
+  "username/nvHopper.nvim",
+  config = function()
+    require("hopper").setup({
+      open_mapping = "<leader>m",
+      jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
+    })
+  end
+}
+```
+
+---
+
+## Configuration
+
+Place the following in your `init.lua` (or relevant config file):
 
 ```lua
 require("hopper").setup({
-	open_mapping = "<leader>m",
-	jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
+  -- Key mapping to open the floating buffer manager
+  open_mapping = "<leader>m",
+
+  -- Keys for jumping directly to marked buffers
+  jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
 })
 ```
 
-open_mapping opens the floating buffer manger window
-feel free to add as many jump_mappings as possible and needed
+**Notes:**
 
-default mappings are Leader+m to open floating window and Leader+no(eg 1 2 3) to switch windows
+- `open_mapping` opens the **floating buffer manager** window.
+- `jump_mappings` are shortcuts to instantly switch to a marked buffer.
+- You can define **as many jump mappings** as you want.
 
-## On the floating window
+**Defaults:**
 
-press Enter to toggle mark the buffer as switchable. Then press the jump_mappings in order to go there.
-Press J/K to move up and down
+- `Leader + m` → Open buffer manager
+- `Leader + n` `Leader + o` → Switch to buffers (example sequence: `<leader>1`, `<leader>2`, `<leader>3`)
+
+---
+
+## Usage
+
+### Inside the Floating Window
+
+- **`Enter`** → Toggle mark/unmark a buffer as _switchable_
+- **`J`**\*\* / \*\***`K`** → Move selection down/up
+- **Jump Mapping** → Instantly switch to the marked buffer
+
+---
