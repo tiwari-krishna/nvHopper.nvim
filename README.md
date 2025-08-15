@@ -5,7 +5,7 @@ Neovim buffer switcher
 ## Enable the follwing code inside of your init.lua
 
 ```lua
-require("buffSwitch").setup({
+require("hopper").setup({
 	open_mapping = "<leader>m",
 	jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
 })
