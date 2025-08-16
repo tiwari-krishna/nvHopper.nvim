@@ -10,7 +10,7 @@ Install via your favorite plugin manager (example using [lazy.nvim](https://gith
 
 ```lua
 {
-  "username/nvHopper.nvim",
+  "tiwari-krishna/nvHopper.nvim",
   config = function()
     require("hopper").setup({
       open_mapping = "<leader>m",
