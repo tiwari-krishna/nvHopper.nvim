@@ -111,6 +111,14 @@ function M.jump_to_mark(idx)
 end
 
 function M.open()
+	-- If window is open and valid, toggle close
+	if M.win and vim.api.nvim_win_is_valid(M.win) then
+		vim.api.nvim_win_close(M.win, true)
+		M.win, M.buf = nil, nil
+		return
+	end
+
+	-- Otherwise, open fresh window
 	rebuild_list()
 	M.buf = vim.api.nvim_create_buf(false, true)
 	M.win = vim.api.nvim_open_win(M.buf, true, {
@@ -132,6 +140,7 @@ function M.open()
 	map("q", function()
 		if M.win and vim.api.nvim_win_is_valid(M.win) then
 			vim.api.nvim_win_close(M.win, true)
+			M.win, M.buf = nil, nil
 		end
 	end)
 	map("<CR>", toggle_mark)
