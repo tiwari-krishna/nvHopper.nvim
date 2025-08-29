@@ -60,7 +60,7 @@ require("hopper").setup({
 
 - **`Leader + m`** → Open the floating buffer manager with all the open neovim buffers
 - **`Enter`** → Toggle mark/unmark a buffer as _switchable_
-- **`J`**\*\* / \*\***`K`** → Move selection down/up
+- **`J`** / **`K`** → Move selection down/up
 - **Jump Mapping** → Instantly switch to the marked buffer
 - **dd** closed the buffer under the cursor. If modified asks to save or not.
 - **gl** Opens the buffer in last focused/selected window.
