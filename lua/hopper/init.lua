@@ -125,6 +125,15 @@ local function refresh_lines()
     vim.bo[M.buf].modifiable = true
     vim.api.nvim_buf_set_lines(M.buf, 0, -1, false, lines)
     vim.bo[M.buf].modifiable = prev
+
+    vim.api.nvim_set_hl(0, "NvHopperMarked", { bold = true })
+    vim.api.nvim_buf_clear_namespace(M.buf, 0, 0, -1)
+
+    for i, b in ipairs(M.list) do
+        if M.marks[b] then
+            vim.api.nvim_buf_add_highlight(M.buf, 0, "NvHopperMarked", i - 1, 0, -1)
+        end
+    end
 end
 
 local function load_session()
@@ -209,6 +218,35 @@ function M.jump_to_mark(idx)
     end
 end
 
+local function open_floating_window(buf)
+    local width_frac = 0.5
+    local height_frac = 0.4
+    local min_width, min_height = 30, 8
+
+    local total_cols = vim.o.columns
+    local total_lines = vim.o.lines
+
+    local width = math.max(min_width, math.floor(total_cols * width_frac))
+    local height = math.max(min_height, math.floor(total_lines * height_frac))
+
+    local row = 1
+    local col = math.floor((total_cols - width) / 2)
+
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = "editor",
+        style = "minimal",
+        border = "rounded",
+        width = width,
+        height = height,
+        row = row,
+        col = col,
+        title = "NvHopper",
+        title_pos = "center",
+    })
+
+    return win
+end
+
 function M.open()
     if M.win and vim.api.nvim_win_is_valid(M.win) then
         vim.api.nvim_win_close(M.win, true)
@@ -221,22 +259,7 @@ function M.open()
     rebuild_list(true)
 
     M.buf = vim.api.nvim_create_buf(false, true)
-    M.win = vim.api.nvim_open_win(M.buf, true, {
-        relative = "editor",
-        style = "minimal",
-        border = "rounded",
-        title = {
-            { "N", "Normal" }, { "v", "Normal" }, { "H", "Normal" },
-            { "o", "Normal" }, { "p", "Normal" }, { "p", "Normal" },
-            { "e", "Normal" }, { "r", "Normal" },
-        },
-        title_pos = "center",
-
-        width = math.max(30, math.floor(vim.o.columns * 0.5)),
-        height = math.max(8, math.floor(vim.o.lines * 0.4)),
-        row = math.floor((vim.o.lines - math.floor(vim.o.lines * 1.0)) / 2),
-        col = math.floor((vim.o.columns - math.floor(vim.o.columns * 0.5)) / 2),
-    })
+    M.win = open_floating_window(M.buf)
     vim.bo[M.buf].bufhidden = "wipe"
     vim.bo[M.buf].filetype = "simple_buffer_marks"
     refresh_lines()
