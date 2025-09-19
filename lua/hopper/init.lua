@@ -263,6 +263,7 @@ function M.open()
     vim.bo[M.buf].bufhidden = "wipe"
     vim.bo[M.buf].filetype = "simple_buffer_marks"
     refresh_lines()
+    vim.wo[M.win].cursorline = true
 
     local function map(lhs, rhs)
         vim.keymap.set("n", lhs, rhs, { buffer = M.buf, nowait = true, silent = true })
