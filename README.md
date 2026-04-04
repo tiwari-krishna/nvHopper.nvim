@@ -82,7 +82,7 @@ require("hopper").setup({
 - **Jump Mapping** → Instantly switch to the marked buffer
 - **dd** closed the buffer under the cursor. If modified asks to save or not.
 - **gl** Opens the buffer in last focused/selected window.
-- **`Leader + bs`** Saves the list of currently open buffers alongside the numbered mark for current working directory *if enabled with manual boolean in persist*
-- **`Leader + bl`** Loads the saved list of buffers alongside their numbered marks for currently working directory *if enabled with manual boolean in persist*
+- **`Leader + bs`** Saves the list of currently open buffers alongside the numbered mark for current working directory *(if enabled with manual boolean in persist)*
+- **`Leader + bl`** Loads the saved list of buffers alongside their numbered marks for currently working directory *(if enabled with manual boolean in persist)*
 
 ---
