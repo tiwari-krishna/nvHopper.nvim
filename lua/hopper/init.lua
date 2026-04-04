@@ -5,33 +5,63 @@ M.marks, M.list, M.win, M.buf, M.prev_win = {}, {}, nil, nil, nil
 M.config = {
     open_mapping = "<leader>m",
     jump_mappings = {
-        "<leader>1",
-        "<leader>2",
-        "<leader>3",
-        "<leader>4",
-        "<leader>5",
-        "<leader>6",
-        "<leader>7",
-        "<leader>8",
-        "<leader>9",
+        "<leader>1", "<leader>2", "<leader>3",
+        "<leader>4", "<leader>5", "<leader>6",
+        "<leader>7", "<leader>8", "<leader>9",
     },
     goto_file = "gl",
     delete_buffer = "dd",
     persist = {
+        auto = true,   -- enables auto save and load
+        manual = true, -- enable keymaps
         save_session = "<leader>bs",
         load_session = "<leader>bl",
     },
 }
 
+local function git_root()
+    local dir = vim.fn.finddir(".git", ".;")
+    if dir == "" then return nil end
+    return vim.fn.fnamemodify(dir, ":h")
+end
+
+local function git_branch()
+    local root = git_root()
+    if not root then return nil end
+
+    local head = root .. "/.git/HEAD"
+    if vim.fn.filereadable(head) == 0 then return nil end
+
+    local line = vim.fn.readfile(head)[1]
+    local branch = line:match("ref: refs/heads/(.+)")
+    return branch or "detached"
+end
+
+local function is_home()
+    return vim.loop.cwd() == vim.loop.os_homedir()
+end
+
 local function session_file()
-    local cwd = vim.loop.cwd()
     local base = vim.fn.stdpath("data") .. "/nvhopper"
     vim.fn.mkdir(base, "p")
-    local fname = cwd:gsub("[/:\\]", "_")
+
+    local root = git_root()
+    local key
+
+    if root then
+        local branch = git_branch() or "unknown"
+        key = root .. "::" .. branch
+    else
+        key = vim.loop.cwd()
+    end
+
+    local fname = vim.fn.sha256(key)
     return base .. "/" .. fname .. ".json"
 end
 
 local function save_session()
+    if is_home() then return end
+
     local data = {
         list = {},
         marks = {},
@@ -137,9 +167,11 @@ local function refresh_lines()
 end
 
 local function load_session()
+    if is_home() then return end
+
     local file = session_file()
     if vim.fn.filereadable(file) == 0 then
-        vim.notify("nvhopper: no saved session for cwd", vim.log.levels.WARN)
+        vim.notify("nvhopper: no saved session for cwd/branch", vim.log.levels.WARN)
         return
     end
     local raw = table.concat(vim.fn.readfile(file), "\n")
@@ -232,6 +264,9 @@ local function open_floating_window(buf)
     local row = 1
     local col = math.floor((total_cols - width) / 2)
 
+    local branch = git_branch()
+    local title = branch and ("NvHopper [" .. branch .. "]") or "NvHopper"
+
     local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         style = "minimal",
@@ -240,7 +275,7 @@ local function open_floating_window(buf)
         height = height,
         row = row,
         col = col,
-        title = "NvHopper",
+        title = title,
         title_pos = "center",
     })
 
@@ -341,7 +376,8 @@ function M.setup(opts)
                 { desc = "Jump to buffer mark " .. i })
         end
     end
-    if M.config.persist then
+
+    if M.config.persist and M.config.persist.manual then
         if M.config.persist.save_session then
             vim.keymap.set("n", M.config.persist.save_session, save_session,
                 { desc = "Save buffer marks session" })
@@ -350,6 +386,17 @@ function M.setup(opts)
             vim.keymap.set("n", M.config.persist.load_session, load_session,
                 { desc = "Load buffer marks session" })
         end
+    end
+
+    if M.config.persist and M.config.persist.auto then
+        vim.api.nvim_create_autocmd("VimEnter", {
+            callback = function()
+                vim.schedule(load_session)
+            end,
+        })
+        vim.api.nvim_create_autocmd("VimLeavePre", {
+            callback = save_session,
+        })
     end
 
     vim.api.nvim_create_user_command("NvHopperSave", save_session, { desc = "Save buffer marks session" })
