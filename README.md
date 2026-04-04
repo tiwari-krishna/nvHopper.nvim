@@ -18,6 +18,8 @@ Install via your favorite plugin manager (example using [lazy.nvim](https://gith
       delete_buffer = "dd",
       jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
       persist = {
+        auto = true,  -- Auto Save on closing and Load on starting of NeoVim
+        manual = true, -- Enable Manual keymaps for session saving and loading
         save_session = "<leader>bs",
         load_session = "<leader>bl",
       },
@@ -44,6 +46,8 @@ require("hopper").setup({
     jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
     -- Save what buffers are open in current working directory and load them later
     persist = {
+        auto = true,  -- Auto Save on closing and Load on starting of NeoVim
+        manual = true, -- Enable Manual keymaps for session saving and loading
         save_session = "<leader>bs",
         load_session = "<leader>bl",
     },
@@ -78,7 +82,7 @@ require("hopper").setup({
 - **Jump Mapping** → Instantly switch to the marked buffer
 - **dd** closed the buffer under the cursor. If modified asks to save or not.
 - **gl** Opens the buffer in last focused/selected window.
-- **`Leader + bs`** Saves the list of currently open buffers alongside the numbered mark for current working directory
-- **`Leader + bl`** Loads the saved list of buffers alongside their numbered marks for currently working directory
+- **`Leader + bs`** Saves the list of currently open buffers alongside the numbered mark for current working directory *if enabled with manual boolean in persist*
+- **`Leader + bl`** Loads the saved list of buffers alongside their numbered marks for currently working directory *if enabled with manual boolean in persist*
 
 ---
