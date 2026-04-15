@@ -2,7 +2,7 @@
 
 `nvHopper` is a minimal, persistent buffer marking and navigation plugin for Neovim.
 
-It provides a **stable, ordered working set** of buffers with fast indexed jumps, scoped to the directory where Neovim was started with git branch awareness.
+It provides a **stable, ordered working set** of buffers with fast indexed jumps, scoped to the directory where Neovim was started, with git branch awareness.
 
 ---
 
@@ -21,7 +21,7 @@ It provides a **stable, ordered working set** of buffers with fast indexed jumps
 ## 🧠 Design Principles
 
 * **Static root context**
-  Sessions are tied to the directory where Neovim was initially launched, regardless of later `:cd` changes.
+  Sessions are tied to the directory where Neovim was initially launched, regardless of later `:cd` changes. This results in separate sessions per git branch.
 
 * **Ordered workflow**
   Buffers are treated as an ordered working set rather than an unordered list.
@@ -90,8 +90,6 @@ This opens a floating window displaying all listed buffers.
 
 Buffers are accessed in the order they were marked.
 
-*Hitting Backspace swaps between last used buffers.*
-
 ---
 
 ## 💾 Sessions
@@ -100,6 +98,7 @@ Sessions are automatically persisted and restored.
 
 Session identity is derived from:
 
+* Sessions are automatically loaded on startup and saved on exit (if enabled).
 * the working directory where Neovim was started
 * the current git branch (if inside a git repo)
 
@@ -179,5 +178,4 @@ require("nvhopper").setup({
 * A maximum of **9 buffers** can be marked
 * Only file-backed buffers are persisted
 * Sessions are not affected by directory changes (`:cd`)
-
-*If git branch is switched when neovim is running, it might cause chaos*
+* Git branch is detected at startup; switching branches during a session may lead to mismatched state
