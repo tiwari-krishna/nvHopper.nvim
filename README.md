@@ -1,88 +1,198 @@
-# nvHopper.nvim
+# nvHopper
 
-A **fast, lightweight buffer switcher** for Neovim, with a floating-window interface, jump-based navigation and persistence session saving when explictly asked.
+`nvHopper` is a minimal, persistent buffer marking and navigation plugin for Neovim.
+
+It provides a **stable, ordered working set** of buffers with fast indexed jumps, scoped to the directory where Neovim was started. The design favors determinism, simplicity, and keyboard-driven workflows over feature-heavy abstractions.
 
 ---
 
-## Installation
+## ✨ Features
 
-Install via your favorite plugin manager (example using [lazy.nvim](https://github.com/folke/lazy.nvim)):
+* Mark up to **9 buffers** for quick access
+* Jump directly via indexed mappings (`<leader>1..9`)
+* Persistent sessions (per project and git branch)
+* Ordered buffer list with manual reordering
+* Floating window interface
+* Support for split navigation
+* Last-buffer swap
+* No external dependencies
+
+---
+
+## 🧠 Design Principles
+
+* **Static root context**
+  Sessions are tied to the directory where Neovim was initially launched, regardless of later `:cd` changes.
+
+* **Ordered workflow**
+  Buffers are treated as an ordered working set rather than an unordered list.
+
+* **Minimal interface**
+  Relies on native Vim features (e.g. `/` for search) instead of duplicating functionality.
+
+* **Deterministic behavior**
+  No hidden state or implicit reordering.
+
+---
+
+## 📦 Installation
+
+### lazy.nvim
 
 ```lua
 {
   "tiwari-krishna/nvHopper.nvim",
   config = function()
-    require("hopper").setup({
-      open_mapping = "<leader>m",
-      goto_file = "gl",
-      delete_buffer = "dd",
-      jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
-      persist = {
-        auto = true,  -- Auto Save on closing and Load on starting of NeoVim
-        manual = true, -- Enable Manual keymaps for session saving and loading
-        save_session = "<leader>bs",
-        load_session = "<leader>bl",
-      },
-    })
+    require("nvHopper").setup()
   end
 }
 ```
 
----
-
-## Configuration
-
-Place the following in your `init.lua` (or relevant config file):
+### vim.pack
 
 ```lua
-require("hopper").setup({
-    -- Key mapping to open the floating buffer manager
-    open_mapping = "<leader>m",
-    -- Open the buffer under the cursor in last focused window or split
-    goto_file = "gl",
-    -- Close buffer under the cursor (does not work if the buffer is open in a window)
-    delete_buffer = "dd",
-    -- Keys for jumping directly to marked buffers
-    jump_mappings = { "<leader>i", "<leader>o", "<leader>p", "<leader>[" },
-    -- Save what buffers are open in current working directory and load them later
-    persist = {
-        auto = true,  -- Auto Save on closing and Load on starting of NeoVim
-        manual = true, -- Enable Manual keymaps for session saving and loading
-        save_session = "<leader>bs",
-        load_session = "<leader>bl",
-    },
+vim.pack.add({
+  { src = "https://github.com/tiwari-krishna/nvHopper.nvim" }
+})
+
+require("nvHopper").setup()
+```
+
+---
+
+## 🚀 Usage
+
+### Opening the buffer list
+
+```vim
+<leader>m
+```
+
+This opens a floating window displaying all listed buffers.
+
+---
+
+### Window keybindings
+
+| Key       | Action                     |
+| --------- | -------------------------- |
+| `<CR>`    | Toggle mark                |
+| `J` / `K` | Move buffer down / up      |
+| `gl`      | Open buffer                |
+| `gs`      | Open in horizontal split   |
+| `gv`      | Open in vertical split     |
+| `<BS>`    | Swap to last buffer        |
+| `dd`      | Delete buffer              |
+| `C`       | Clear all marks            |
+| `r`       | Refresh buffer list        |
+| `q`       | Close window               |
+| `/`       | Search (native Vim search) |
+
+---
+
+### Jumping to marked buffers
+
+```vim
+<leader>1 ... <leader>9
+```
+
+Buffers are accessed in the order they were marked.
+
+---
+
+### Last buffer swap
+
+```vim
+<BS>
+```
+
+This mapping is available globally (outside the window as well).
+
+---
+
+## 💾 Sessions
+
+Sessions are automatically persisted and restored.
+
+Session identity is derived from:
+
+* the working directory where Neovim was started
+* the current git branch (if applicable)
+
+---
+
+### Manual session control
+
+| Mapping / Command | Action       |
+| ----------------- | ------------ |
+| `<leader>bs`      | Save session |
+| `<leader>bl`      | Load session |
+| `:NvHopperSave`   | Save session |
+| `:NvHopperLoad`   | Load session |
+
+---
+
+## ⚙️ Configuration
+
+Default configuration:
+
+```lua
+require("nvhopper").setup({
+  open_mapping = "<leader>m",
+
+  jump_mappings = {
+    "<leader>1", "<leader>2", "<leader>3",
+    "<leader>4", "<leader>5", "<leader>6",
+    "<leader>7", "<leader>8", "<leader>9",
+  },
+
+  goto_file = "gl",
+  clear_mark = "C",
+  split_h = "gs",
+  split_v = "gv",
+  swap_last = "<BS>",
+  delete_buffer = "dd",
+
+  persist = {
+    auto = true,
+    manual = true,
+    save_session = "<leader>bs",
+    load_session = "<leader>bl",
+  },
 })
 ```
 
-**Notes:**
+---
 
-- Buffers currently open in one of the windows can't be closed using `delete_buffer`.
-- `jump_mappings` are shortcuts to instantly switch to a marked buffer.
-- You can define **as many jump mappings** as you want. Default leader+<num> is shown in the list of floating window
-- Buffers are neither automatically saved nor loaded. You need to explictly call the keymaps to do so.
-- You can't save scratch buffers or terminal buffers.
+### Disabling features
 
-**Defaults:**
+Any mapping or feature can be disabled by setting it to `nil` or `false`:
 
-- `Leader + m` → Open buffer manager
-- `Leader + 1` `Leader + 2 .....` → Switch to buffers in sequence. (number shown in marked marker)
-- `Leader + bs` → Saves list of currently open buffers alognside their marked state for current working directory
-- `Leader + bs` → Loads list of saved buffers under current working directory.
-- In the floating window `gl` shows the buffer under cursor and `dd` removes buffer if it is not currently visible in any split or tab (if modified then asks to save).
+```lua
+require("nvhopper").setup({
+  swap_last = nil,
+  persist = {
+    auto = false,
+  },
+})
+```
 
 ---
 
-## Usage
+## 📌 Commands
 
-### Inside the Floating Window
-
-- **`Leader + m`** → Open the floating buffer manager with all the open neovim buffers
-- **`Enter`** → Toggle mark/unmark a buffer as _switchable_
-- **`J`** / **`K`** → Move selection down/up
-- **Jump Mapping** → Instantly switch to the marked buffer
-- **dd** closed the buffer under the cursor. If modified asks to save or not.
-- **gl** Opens the buffer in last focused/selected window.
-- **`Leader + bs`** Saves the list of currently open buffers alongside the numbered mark for current working directory *(if enabled with manual boolean in persist)*
-- **`Leader + bl`** Loads the saved list of buffers alongside their numbered marks for currently working directory *(if enabled with manual boolean in persist)*
+```vim
+:NvHopperOpen    " Open buffer list
+:NvHopperSave    " Save session
+:NvHopperLoad    " Load session
+:NvHopperJump N  " Jump to mark N
+```
 
 ---
+
+## 📝 Notes
+
+* A maximum of **9 buffers** can be marked
+* Only file-backed buffers are persisted
+* Sessions are not affected by directory changes (`:cd`)
+* Search within the list uses native Vim `/`
