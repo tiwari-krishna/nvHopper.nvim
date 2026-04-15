@@ -2,7 +2,7 @@
 
 `nvHopper` is a minimal, persistent buffer marking and navigation plugin for Neovim.
 
-It provides a **stable, ordered working set** of buffers with fast indexed jumps, scoped to the directory where Neovim was started. The design favors determinism, simplicity, and keyboard-driven workflows over feature-heavy abstractions.
+It provides a **stable, ordered working set** of buffers with fast indexed jumps, scoped to the directory where Neovim was started with git branch awareness.
 
 ---
 
@@ -15,7 +15,6 @@ It provides a **stable, ordered working set** of buffers with fast indexed jumps
 * Floating window interface
 * Support for split navigation
 * Last-buffer swap
-* No external dependencies
 
 ---
 
@@ -26,12 +25,6 @@ It provides a **stable, ordered working set** of buffers with fast indexed jumps
 
 * **Ordered workflow**
   Buffers are treated as an ordered working set rather than an unordered list.
-
-* **Minimal interface**
-  Relies on native Vim features (e.g. `/` for search) instead of duplicating functionality.
-
-* **Deterministic behavior**
-  No hidden state or implicit reordering.
 
 ---
 
@@ -86,7 +79,6 @@ This opens a floating window displaying all listed buffers.
 | `C`       | Clear all marks            |
 | `r`       | Refresh buffer list        |
 | `q`       | Close window               |
-| `/`       | Search (native Vim search) |
 
 ---
 
@@ -98,15 +90,7 @@ This opens a floating window displaying all listed buffers.
 
 Buffers are accessed in the order they were marked.
 
----
-
-### Last buffer swap
-
-```vim
-<BS>
-```
-
-This mapping is available globally (outside the window as well).
+*Hitting Backspace swaps between last used buffers.*
 
 ---
 
@@ -117,7 +101,7 @@ Sessions are automatically persisted and restored.
 Session identity is derived from:
 
 * the working directory where Neovim was started
-* the current git branch (if applicable)
+* the current git branch (if inside a git repo)
 
 ---
 
@@ -195,4 +179,5 @@ require("nvhopper").setup({
 * A maximum of **9 buffers** can be marked
 * Only file-backed buffers are persisted
 * Sessions are not affected by directory changes (`:cd`)
-* Search within the list uses native Vim `/`
+
+*If git branch is switched when neovim is running, it might cause chaos*
