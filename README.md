@@ -178,4 +178,4 @@ require("nvHopper").setup({
 * A maximum of **9 buffers** can be marked
 * Only file-backed buffers are persisted
 * Sessions are not affected by directory changes (`:cd`)
-* Git branch is detected at startup; switching branches during a session may lead to mismatched state
+* Git branch is detected at startup; switching branches during a session may lead to mismatched state.
