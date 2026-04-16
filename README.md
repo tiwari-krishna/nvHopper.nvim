@@ -120,7 +120,7 @@ Session identity is derived from:
 Default configuration:
 
 ```lua
-require("nvhopper").setup({
+require("nvHopper").setup({
   open_mapping = "<leader>m",
 
   jump_mappings = {
@@ -152,7 +152,7 @@ require("nvhopper").setup({
 Any mapping or feature can be disabled by setting it to `nil` or `false`:
 
 ```lua
-require("nvhopper").setup({
+require("nvHopper").setup({
   swap_last = nil,
   persist = {
     auto = false,
